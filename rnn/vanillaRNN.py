@@ -2,30 +2,33 @@ import tensorflow as tf
 import numpy as np
 import random
 import math
+import matplotlib.pyplot as plt
+
 sess = tf.Session()
 
 
 def generate_data_sin(num_sequence, index, echo_step):
     #start = random.randint(0,101)
-    index = 0
+    #index = 0
     #eight_of_pi = math.pi / 8
-    radian_step = math.pi / 8
+    radian_step = math.pi / 16
     t = np.arange(index, num_sequence+index)
     xs = np.sin(t * radian_step)
-    ys = np.roll(xs, echo_step)
+    ys = np.roll(xs, -1 * echo_step)
+    #ys = np.rollaxis(xs, echo_step)
     #ys[0:echo_step] = 0
     return xs, ys, num_sequence+index
 
-num_of_recurrences = 10
+num_of_recurrences = 40
 size_of_input_x = 1
 
 size_of_h_t = 10
 
 size_of_output_y = 1
 
-echo_step = 5
+echo_step = 2
 
-
+num_of_epochs = 5000
 
 # first dimension are the input size of each x_i vector,
 # second dimension is the t_i (how many recurrences),
@@ -68,7 +71,7 @@ file_writer = tf.summary.FileWriter('./summary_data_for_tensorboard', sess.graph
 # Training
 # Generate data:
 
-num_of_epochs = 10000
+
 index = 0
 for epoch in range(num_of_epochs):
 
@@ -79,20 +82,41 @@ for epoch in range(num_of_epochs):
     #print("y_raw")
     #print(Y_raw)
     X_raw = np.reshape(X_raw, (size_of_input_x, num_of_recurrences, 1))
-
     Y_raw = np.reshape(Y_raw, (size_of_output_y, num_of_recurrences))
 
     # fit variables into tensorflow:
     [cur_traing, cur_cost, cur_Y] = sess.run([train, loss, Ys_tensor], {X: X_raw, Y_hat: Y_raw})
     print("Epoch number %s, loss is %s" % (epoch, cur_cost))
 
-
 [cur_cost, cur_Y] = sess.run([loss, Ys_tensor], {X: X_raw, Y_hat: Y_raw})
-
 print("y hat =")
 print(Y_raw)
 print("y =")
 print(cur_Y)
+
+
+print('Evaluation')
+for i in range(10):
+    print(".")
+
+
+X_raw, Y_raw, idx = generate_data_sin(num_of_recurrences, 16, echo_step)
+X_raw = np.reshape(X_raw, (size_of_input_x, num_of_recurrences, 1))
+Y_raw = np.reshape(Y_raw, (size_of_output_y, num_of_recurrences))
+[cur_X, cur_Y_hat, cur_Y] = sess.run([X,Y_hat, Ys_tensor], {X: X_raw, Y_hat: Y_raw})
+
+
+cur_Y_hat = np.reshape(cur_Y_hat, (-1))
+cur_Y = np.reshape(cur_Y, (-1))
+cur_X = np.reshape(cur_X, (-1))
+label_Y_hat, = plt.plot(cur_Y_hat, label='cur_Y_hat')
+label_cur_Y, = plt.plot(cur_Y, label='cur_Y')
+label_cur_X, = plt.plot(cur_X, label='cur_X')
+plt.legend(handles=[label_Y_hat, label_cur_Y, label_cur_X])
+plt.draw()
+plt.show()
+
+
 
 
 

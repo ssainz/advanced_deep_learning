@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="9056d9be-dacf-49d3-bd76-d19b768e87e2" name="tensorflow_scripts" url="http://sergiosp01.hopto.org">
+        <fileTransfer host="sergiosp01.hopto.org" port="60845" rootFolder="/home/sergio" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="60845" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -14,3 +14,7 @@ print("node3:", node3)
 
 file_writer = tf.summary.FileWriter('./summary_data_for_tensorboard', sess.graph)
 print("sess.run(node3):", sess.run(node3))
+
+
+# run in tensorboard with:
+# tensorboard --logdir=path/to/log-directory

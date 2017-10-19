@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="tensorflow_scripts">
+    <serverData>
+      <paths name="tensorflow_scripts">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/Projects/tensorflow_virtualenv/ssainz/tensorflow_scripts" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
