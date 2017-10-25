@@ -7,6 +7,7 @@ matplotlib.use('Qt5Agg')
 import numpy as np
 import random
 
+# define
 
 # Define one layer of CNN:
 def generate_deep_net(size_of_image = 784,
