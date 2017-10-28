@@ -244,7 +244,7 @@ def generate_deep_net_normal_const_init(size_of_image = 784,
     return (train, loss, accuracy, x, y_hat, y)
 
 # Prints feature maps and filters. It prints a feature map in a row.
-def print_convolutions(convolution):
+def print_filters(convolutions):
     for convolution_name in convolutions.keys():
         # For each convolution, go over its feature maps:
         convolution = convolutions[convolution_name]
@@ -304,7 +304,7 @@ for i in range(60):
 
 # Model evaluation:
 
-print("Print convolution filters and feature maps")
+print("Print filters of feature maps")
 # >>> b.shape
 # (3, 3, 3)
 # >>> b[:,:,0]
@@ -318,8 +318,8 @@ print("Print convolution filters and feature maps")
 [testing_y, testing_y_hat, W_conv1, W_conv2] =  sess.run([y, y_hat, W_conv1, W_conv2], feed_dict={x: mnist.test.images, y_hat: mnist.test.labels})
 
 # Go over the convolutions:
-convolutions = {"W_conv1":W_conv1, "W_conv2":W_conv2}
-print_convolutions(convolutions)
+filters = {"W_conv1":W_conv1, "W_conv2":W_conv2}
+print_filters(filters)
 
 print("Print 3 samples")
 [testing_y, testing_y_hat] =  sess.run([y, y_hat], feed_dict={x: mnist.test.images, y_hat: mnist.test.labels})

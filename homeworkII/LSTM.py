@@ -52,20 +52,35 @@ def load_word_vector(word_vector_file):
     return word_vectors
 
 # Create Vanilla RNN:
-def create_vanilla_rnn(size_of_h_t, size_of_input_x, size_of_output_y, time_steps):
+def create_lstm_rnn(size_of_h_t, size_of_input_x, size_of_output_y, time_steps):
 
     X = tf.placeholder(shape=(size_of_input_x, time_steps, None), dtype=tf.float32)
     Y_hat = tf.placeholder(shape=(size_of_output_y, None), dtype=tf.float32)
-    h_0 = tf.placeholder(shape=(size_of_h_t, None), dtype=tf.float32)
+    C_0 = tf.placeholder(shape=(size_of_h_t, None), dtype=tf.float32)
+    h_0  = tf.placeholder(shape=(size_of_h_t, None), dtype=tf.float32)
 
     # RNN weights
-    W_h = tf.Variable(tf.random_normal([size_of_h_t, size_of_h_t], stddev=0.1), name="W_h")
-    b_h = tf.Variable(tf.random_normal([size_of_h_t, 1], stddev=0.1), name="b_h")
-    W_i = tf.Variable(tf.random_normal([size_of_h_t, size_of_input_x], stddev=0.1), name="W_i")
+    # Input gate:
+    W_i = tf.Variable(tf.random_normal([size_of_h_t, size_of_input_x + size_of_h_t], stddev=0.1), name="W_i")
     b_i = tf.Variable(tf.random_normal([size_of_h_t, 1], stddev=0.1), name="b_i")
 
-    W_o = tf.Variable(tf.random_normal([size_of_output_y, size_of_h_t], stddev=0.1), name="W_o")
-    b_o = tf.Variable(tf.random_normal([size_of_output_y,1], stddev=0.1), name="b_o")
+    # New state gate:
+    W_c = tf.Variable(tf.random_normal([size_of_h_t, size_of_input_x + size_of_h_t], stddev=0.1), name="W_c")
+    b_c = tf.Variable(tf.random_normal([size_of_h_t, 1], stddev=0.1), name="b_c")
+
+    # Forget gate:
+    W_f = tf.Variable(tf.random_normal([size_of_h_t, size_of_input_x + size_of_h_t], stddev=0.1), name="W_f")
+    b_f = tf.Variable(tf.random_normal([size_of_h_t,1], stddev=0.1), name="b_f")
+
+    # LSTM cell output gate:
+    W_o = tf.Variable(tf.random_normal([size_of_h_t, size_of_input_x + size_of_h_t], stddev=0.1), name="W_o")
+    b_o = tf.Variable(tf.random_normal([size_of_h_t, 1], stddev=0.1), name="b_o")
+
+    # Actual output weights
+    W_out = tf.Variable(tf.random_normal([size_of_output_y, size_of_h_t], stddev=0.1), name="W_out")
+    b_out = tf.Variable(tf.random_normal([size_of_output_y, 1], stddev=0.1), name="b_out")
+
+
 
     x_slices_per_time_step = tf.unstack(X, axis=1) # each slice will be of shape (size_of_input_x, batch_size)
 
@@ -75,14 +90,40 @@ def create_vanilla_rnn(size_of_h_t, size_of_input_x, size_of_output_y, time_step
     for x_slice_per_time_step in x_slices_per_time_step:
         if first:
             # The initial state is used just once! the first time
-            h_t = tf.tanh(  (tf.matmul(W_h, h_0) + b_h ) + (tf.matmul(W_i, x_slice_per_time_step) + b_i)  )
+
+            # Create concatenation of X for this time step and h_t
+            x_AND_h_t = tf.concat([x_slice_per_time_step, h_0], axis=0)
+
+            # Use C_0 as C_t
+            C_t = C_0
+
             first = False
         else:
             # h_t calculates again, and again and so on
-            h_t = tf.tanh(  (tf.matmul(W_h, h_t) + b_h ) + (tf.matmul(W_i, x_slice_per_time_step) + b_i)  )
+
+            x_AND_h_t = tf.concat([x_slice_per_time_step, h_t], axis=0)
+
+        # Forget gate:
+        forget = tf.sigmoid(tf.matmul(W_f, x_AND_h_t) + b_f)
+
+        # Input gate
+        input = tf.sigmoid(tf.matmul(W_i, x_AND_h_t) + b_i)
+
+        # New state:
+        C_new = tf.tanh(tf.matmul(W_c, x_AND_h_t) + b_c)
+
+        # Update C_t
+        C_t = tf.multiply(forget, C_t) + tf.multiply(input, C_new)
+
+        # Output gate
+        output = tf.sigmoid(tf.matmul(W_o, x_AND_h_t) + b_o)
+
+        # Update h_t
+        h_t = tf.multiply(output, tf.tanh(C_t))
+
 
     # Just one final prediction (no intermediate predictions):
-    y_pre_softmax = tf.matmul(W_o, h_t) + b_o
+    y_pre_softmax = tf.matmul(W_out, h_t) + b_out
 
     y = tf.nn.softmax(y_pre_softmax, dim=0)
 
@@ -98,11 +139,11 @@ def create_vanilla_rnn(size_of_h_t, size_of_input_x, size_of_output_y, time_step
     correct_prediction = tf.equal(tf.argmax(y, 0), tf.argmax(Y_hat, 0))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-    return (X, Y_hat, h_0, y, y_pre_softmax, train, accuracy, loss)
+    return (X, Y_hat, h_0, C_0, y, y_pre_softmax, train, accuracy, loss)
 
 batch_size = 10
 size_of_h_t = 100
-(X, Y_hat, h_0, y, y_pre_softmax, train, accuracy, loss) = create_vanilla_rnn(size_of_h_t = size_of_h_t,
+(X, Y_hat, h_0, C_0, y, y_pre_softmax, train, accuracy, loss) = create_lstm_rnn(size_of_h_t = size_of_h_t,
                                                        size_of_input_x = 50,
                                                        size_of_output_y = 2,
                                                        time_steps = 100)
@@ -120,10 +161,10 @@ init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-initial_h_0 = np.zeros(shape=(size_of_h_t, batch_size), dtype=np.float32)
+initial_h_0 = initial_C_0 = np.zeros(shape=(size_of_h_t, batch_size), dtype=np.float32)
 
-vanilla_training_loss = []
-vanilla_training_accuracy = []
+lstm_training_loss = []
+lstm_training_accuracy = []
 for z in range(1):
     i = 0
     while i < len(_x_training):
@@ -137,10 +178,10 @@ for z in range(1):
         i = next_i
 
         [cur_traing, cur_loss, cur_accuracy, cur_y, cur_y_pre_softmax] = sess.run([train, loss, accuracy, y, y_pre_softmax],
-                                                                                  {X: sample_x, Y_hat: sample_y, h_0: initial_h_0})
+                                                                                  {X: sample_x, Y_hat: sample_y, h_0: initial_h_0, C_0: initial_C_0})
 
-        vanilla_training_accuracy.append(cur_accuracy)
-        vanilla_training_loss.append(cur_loss)
+        lstm_training_accuracy.append(cur_accuracy)
+        lstm_training_loss.append(cur_loss)
 
         print("It[%s], loss [%s], accuracy [%s] " % (i, cur_loss, cur_accuracy))
 
@@ -149,16 +190,16 @@ for z in range(1):
 (_x_test, _y_test) = load_sentences("/srv/datasets/sentiment-data/test.csv", words)
 sample_y = _y_test.transpose()
 sample_x = _x_test.transpose([1,2,0])
-test_initial_h_0 = np.zeros(shape=(size_of_h_t, sample_x.shape[2]), dtype=np.float32)
-[test_loss, test_accuracy] = sess.run([loss, accuracy], {X: sample_x, Y_hat: sample_y, h_0: test_initial_h_0})
+test_initial_h_0 = test_initial_C_0 = np.zeros(shape=(size_of_h_t, sample_x.shape[2]), dtype=np.float32)
+[test_loss, test_accuracy] = sess.run([loss, accuracy], {X: sample_x, Y_hat: sample_y, h_0: test_initial_h_0, C_0: test_initial_C_0})
 print("Testing loss[%s] accuracy [%s]" % (test_loss, test_accuracy))
 
 # Print the training performance
 plt.subplot(2, 1, 1)
-label_training_cost, = plt.plot(np.array(vanilla_training_loss), label='vanilla_rnn_training_loss')
+label_training_cost, = plt.plot(np.array(lstm_training_loss), label='lstm_rnn_training_loss')
 plt.legend(handles=[label_training_cost])
 plt.subplot(2, 1, 2)
-label_training_accuracy, = plt.plot(np.array(vanilla_training_accuracy), label='vanilla_rnn_training_accuracy')
+label_training_accuracy, = plt.plot(np.array(lstm_training_accuracy), label='lstm_rnn_training_accuracy')
 plt.legend(handles=[label_training_accuracy])
 plt.draw()
 plt.show()
