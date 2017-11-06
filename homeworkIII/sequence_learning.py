@@ -379,7 +379,7 @@ sess.run(init)
 # saver.restore(sess, "/srv/datasets/sequence_to_sequence/model.ckpt")
 # print("model restored")
 
-iterations = 10
+iterations = 100
 # One iteration is considered seeing all the potential sequences at least once in random order.
 for it in range(iterations):
     # Generate minibatches of sequences:
