@@ -164,7 +164,7 @@ while first_time == True or (delta_between_sum_of_all_values > 0.01):
             # We do not process invalid state (2, 1), or end states (0,3) or (1,3)
             if not (_x == 2 and _y == 1) and not(_x == 0 and _y == 3) and not(_x == 1 and _y == 3):
                 state_list, actions_name = state_mgr.get_potential_actions(_x,_y)
-                max_a_value = 0
+                max_a_value = None
                 policy_a = state_mgr.get_policy(_x, _y)
                 z = 0
                 for action_name in actions_name:
@@ -204,7 +204,7 @@ while first_time == True or (delta_between_sum_of_all_values > 0.01):
                         sum_new_v_value += new_v_value
 
                     # Check if it is the largest value
-                    if sum_new_v_value > max_a_value:
+                    if max_a_value is None or sum_new_v_value > max_a_value:
                         max_a_value = sum_new_v_value
                         policy_a = [_x_likely, _y_likely]
 
