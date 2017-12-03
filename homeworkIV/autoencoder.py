@@ -103,22 +103,36 @@ def get_precision_recall_of_items_closest_to_K(K, dataset_idx, X_raw, Y_raw, clo
         actual_class.append(cur_class)
 
     actual_class = np.array(actual_class)
-    predicted_class = np.ones(len(actual_class), dtype=np.int32) * K_class
+
+    different_classes = range(10)
+    precisions = []
+    recalls = []
+    for i in different_classes:
+        prec , rec = get_precision_recall_from_series(actual_class, i)
+        precisions.append(prec)
+        recalls.append(rec)
+
+    print(np.array(precisions))
+    print(np.mean(np.array(precisions)))
+    print(np.array(recalls))
+
+    mean_precision = np.mean(np.array(precisions))
+    mean_recall = np.mean(np.array(recalls))
+
+    return mean_precision, mean_recall
+
+def get_precision_recall_from_series(actual_class, predicted_class):
+    predicted_class = np.ones(len(actual_class), dtype=np.int32) * predicted_class
 
     # print(actual_class)
     # print(predicted_class)
     # print(np.nonzero(actual_class == predicted_class)[0])
     tp = len(np.nonzero(actual_class == predicted_class)[0])
-    tn = 0 # because we classify as all the same as the K class
-    fn = 0 # because we classify all as the same class as K class
+    tn = 0  # because we classify as all the same as the K class
+    fn = 0  # because we classify all as the same class as K class
     fp = len(np.nonzero(actual_class != predicted_class)[0])
 
-    # print(tp)
-    # print(fp)
-
     return (tp/(tp+fp)), (tp/tp+fn)
-
-
 
 
 
@@ -160,7 +174,8 @@ dataset_idx, X_raw, Y_raw = get_training_data()
 #print("DATASETs_", dataset_idx.size)
 
 # 4. Loop through the hyperparameters
-hyperparameter_N = [2,5,10,20,50,100]
+#hyperparameter_N = [2,5,10,20,50,100,150]
+hyperparameter_N = [2,5,10]
 networks = []
 for N in hyperparameter_N:
     networks.append((build_encoder_network(image_size=28*28, number_hidden_units=N)))
@@ -186,7 +201,7 @@ saver = tf.train.Saver()
 # 4.2 train the networks:
 losses_list = []
 batch_size = 10
-num_iter = 50
+num_iter = 1
 for network in networks:
     (cur_x, cur_x_hat, cur_loss, cur_train, cur_h_x) = network
     losses = stochastic_gradient_backprogation(sess, number_of_iterations=num_iter, x=cur_x, x_hat=cur_x_hat, loss=cur_loss, train=cur_train, dataset_idx=dataset_idx, X_raw=X_raw, Y_raw=Y_raw, batch_size=batch_size)

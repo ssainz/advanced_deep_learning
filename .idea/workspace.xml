@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2dc5097c-7bad-4ca0-a17b-3f93306e3965" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/homeworkIV/autoencoder.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/homeworkIV/pca.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/homeworkIV/autoencoder.py" afterPath="$PROJECT_DIR$/homeworkIV/autoencoder.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,8 +28,8 @@
       <file leaf-file-name="autoencoder.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/homeworkIV/autoencoder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="162" column="36" lean-forward="false" selection-start-line="162" selection-start-column="36" selection-end-line="162" selection-end-column="36" />
+            <state relative-caret-position="378">
+              <caret line="115" column="39" lean-forward="false" selection-start-line="115" selection-start-column="39" selection-end-line="115" selection-end-column="39" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -55,7 +53,7 @@
         <entry file="file://$PROJECT_DIR$/rnn/LSTM.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1251">
-              <caret line="185" column="80" lean-forward="true" selection-start-line="185" selection-start-column="80" selection-end-line="185" selection-end-column="80" />
+              <caret line="185" column="80" lean-forward="false" selection-start-line="185" selection-start-column="80" selection-end-line="185" selection-end-column="80" />
               <folding />
             </state>
           </provider>
@@ -75,7 +73,7 @@
         <entry file="file://$PROJECT_DIR$/homeworkII/convolutional_network_mnist.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="306">
-              <caret line="197" column="90" lean-forward="true" selection-start-line="197" selection-start-column="26" selection-end-line="197" selection-end-column="90" />
+              <caret line="197" column="90" lean-forward="false" selection-start-line="197" selection-start-column="26" selection-end-line="197" selection-end-column="90" />
               <folding>
                 <element signature="e#0#58#0" expanded="true" />
               </folding>
@@ -109,7 +107,7 @@
         <entry file="file://$PROJECT_DIR$/homeworkII/convolutional_network_cifar.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-4581">
-              <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+              <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
               <folding>
                 <element signature="e#0#58#0" expanded="true" />
               </folding>
@@ -626,7 +624,7 @@
     <entry file="file://$PROJECT_DIR$/homeworkII/convolutional_network_mnist.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
-          <caret line="197" column="90" lean-forward="true" selection-start-line="197" selection-start-column="26" selection-end-line="197" selection-end-column="90" />
+          <caret line="197" column="90" lean-forward="false" selection-start-line="197" selection-start-column="26" selection-end-line="197" selection-end-column="90" />
           <folding>
             <element signature="e#0#58#0" expanded="true" />
           </folding>
@@ -652,7 +650,7 @@
     <entry file="file://$PROJECT_DIR$/rnn/LSTM.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1251">
-          <caret line="185" column="80" lean-forward="true" selection-start-line="185" selection-start-column="80" selection-end-line="185" selection-end-column="80" />
+          <caret line="185" column="80" lean-forward="false" selection-start-line="185" selection-start-column="80" selection-end-line="185" selection-end-column="80" />
           <folding />
         </state>
       </provider>
@@ -660,7 +658,7 @@
     <entry file="file://$PROJECT_DIR$/homeworkII/convolutional_network_cifar.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-4581">
-          <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
           <folding>
             <element signature="e#0#58#0" expanded="true" />
           </folding>
@@ -689,8 +687,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/homeworkIV/autoencoder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="162" column="36" lean-forward="false" selection-start-line="162" selection-start-column="36" selection-end-line="162" selection-end-column="36" />
+        <state relative-caret-position="378">
+          <caret line="115" column="39" lean-forward="false" selection-start-line="115" selection-start-column="39" selection-end-line="115" selection-end-column="39" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
