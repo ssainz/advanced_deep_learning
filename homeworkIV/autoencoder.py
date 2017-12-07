@@ -17,7 +17,7 @@ def get_training_data():
     for i in range(11):
         indx = np.nonzero(Y_raw == i)[0]
         #print(len(indx))
-        first_1000_elements_in_mnist.append(indx[0:1000])
+        first_1000_elements_in_mnist.append(indx[0:100])
 
     dataset_idx = np.concatenate(first_1000_elements_in_mnist)
     # print(len(dataset_idx))
@@ -104,7 +104,8 @@ def get_precision_recall_of_items_closest_to_K(K, dataset_idx, X_raw, Y_raw, clo
 
     actual_class = np.array(actual_class)
 
-    different_classes = range(10)
+    #different_classes = range(10)
+    different_classes = [K_class]
     precisions = []
     recalls = []
     for i in different_classes:
@@ -112,14 +113,30 @@ def get_precision_recall_of_items_closest_to_K(K, dataset_idx, X_raw, Y_raw, clo
         precisions.append(prec)
         recalls.append(rec)
 
-    print(np.array(precisions))
-    print(np.mean(np.array(precisions)))
-    print(np.array(recalls))
+    # print(np.array(precisions))
+    # print(np.sum(np.array(precisions)))
+    # print(np.array(recalls))
 
-    mean_precision = np.mean(np.array(precisions))
-    mean_recall = np.mean(np.array(recalls))
+    siz = len(precisions)
+    mean_precision = np.sum(np.array(precisions)) / siz
+    mean_recall = np.sum(np.array(recalls)) / siz
 
     return mean_precision, mean_recall
+
+def get_precision_recall_average(dataset_idx, X_raw, Y_raw, closes_n_items, latent_spaces, neighborhood_size):
+
+    precs = []
+    recals = []
+    for i in range(len(dataset_idx)):
+        prec, rec = get_precision_recall_of_items_closest_to_K(i, dataset_idx, X_raw, Y_raw, closes_n_items, latent_spaces, neighborhood_size)
+        precs.append(prec)
+        recals.append(rec)
+
+    precs_mean = np.mean(np.array(precs))
+    recals_mean = np.mean(np.array(recals))
+
+    return precs_mean, recals_mean
+
 
 def get_precision_recall_from_series(actual_class, predicted_class):
     predicted_class = np.ones(len(actual_class), dtype=np.int32) * predicted_class
@@ -132,7 +149,15 @@ def get_precision_recall_from_series(actual_class, predicted_class):
     fn = 0  # because we classify all as the same class as K class
     fp = len(np.nonzero(actual_class != predicted_class)[0])
 
-    return (tp/(tp+fp)), (tp/tp+fn)
+    precision = 0
+    if tp != 0:
+        precision = (tp/(tp+fp))
+
+    recall = 0
+    if tp != 0:
+        recall = (tp/tp+fn)
+
+    return precision, recall
 
 
 
@@ -174,8 +199,8 @@ dataset_idx, X_raw, Y_raw = get_training_data()
 #print("DATASETs_", dataset_idx.size)
 
 # 4. Loop through the hyperparameters
-#hyperparameter_N = [2,5,10,20,50,100,150]
-hyperparameter_N = [2,5,10]
+hyperparameter_N = [2,5,10,20,50]
+#hyperparameter_N = [2,5,10]
 networks = []
 for N in hyperparameter_N:
     networks.append((build_encoder_network(image_size=28*28, number_hidden_units=N)))
@@ -201,7 +226,7 @@ saver = tf.train.Saver()
 # 4.2 train the networks:
 losses_list = []
 batch_size = 10
-num_iter = 1
+num_iter = 2000
 for network in networks:
     (cur_x, cur_x_hat, cur_loss, cur_train, cur_h_x) = network
     losses = stochastic_gradient_backprogation(sess, number_of_iterations=num_iter, x=cur_x, x_hat=cur_x_hat, loss=cur_loss, train=cur_train, dataset_idx=dataset_idx, X_raw=X_raw, Y_raw=Y_raw, batch_size=batch_size)
@@ -236,6 +261,54 @@ for network in networks:
     i += 1
 
 
+random_item = random.randint(0, len(dataset_idx))
+latent_spaces_list = []
+batch_size = 10
+i = 0
+neighborhood_size = 50
+for network in networks:
+
+    # First autoencoder.
+    (cur_x, cur_x_hat, cur_loss, cur_train, cur_h_x) = network
+    latent_spaces = get_latent_space_autoencoder(sess, cur_x, dataset_idx, X_raw, cur_h_x)
+    latent_spaces_list.append(latent_spaces)
+    precision, recall = get_precision_recall_average(dataset_idx=dataset_idx, X_raw=X_raw, Y_raw=Y_raw, closes_n_items=50, latent_spaces=latent_spaces, neighborhood_size=neighborhood_size)
+    print("All images, Autoencoder: N=%s, precision=%s, recall=%s" %(hyperparameter_N[i], precision, recall))
+
+    # Second, PCA:
+    latent_space_pca = get_latent_space_pca(dataset_idx, X_raw, hyperparameter_N[i])
+    precision, recall = get_precision_recall_average(dataset_idx=dataset_idx, X_raw=X_raw,
+                                                                   Y_raw=Y_raw, closes_n_items=50,
+                                                                   latent_spaces=latent_space_pca,
+                                                                   neighborhood_size=neighborhood_size)
+    print("All images, PCA        : N=%s, precision=%s, recall=%s" % (hyperparameter_N[i], precision, recall))
+
+
+    i += 1
+
 # 5. Print results.
 save_path = saver.save(sess, "/srv/datasets/autoencoder/model.ckpt")
 print("Model saved in file: %s" % save_path)
+
+
+# Autoencoder: N=2, precision=0.137254901961, recall=1.0
+# PCA        : N=2, precision=0.117647058824, recall=1.0
+# Autoencoder: N=5, precision=0.176470588235, recall=1.0
+# PCA        : N=5, precision=0.117647058824, recall=1.0
+# Autoencoder: N=10, precision=0.156862745098, recall=1.0
+# PCA        : N=10, precision=0.156862745098, recall=1.0
+# Autoencoder: N=20, precision=0.156862745098, recall=1.0
+# PCA        : N=20, precision=0.156862745098, recall=1.0
+# Autoencoder: N=50, precision=0.156862745098, recall=1.0
+# PCA        : N=50, precision=0.156862745098, recall=1.0
+# All images, Autoencoder: N=2, precision=0.108862745098, recall=1.0
+# All images, PCA        : N=2, precision=0.10731372549, recall=0.999
+# All images, Autoencoder: N=5, precision=0.128823529412, recall=1.0
+# All images, PCA        : N=5, precision=0.130098039216, recall=1.0
+# All images, Autoencoder: N=10, precision=0.13768627451, recall=1.0
+# All images, PCA        : N=10, precision=0.138941176471, recall=1.0
+# All images, Autoencoder: N=20, precision=0.141176470588, recall=1.0
+# All images, PCA        : N=20, precision=0.140882352941, recall=1.0
+# All images, Autoencoder: N=50, precision=0.142196078431, recall=1.0
+# All images, PCA        : N=50, precision=0.141352941176, recall=1.0
+# Model saved in file: /srv/datasets/autoencoder/model.ckpt
